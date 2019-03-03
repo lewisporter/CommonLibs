@@ -48,7 +48,7 @@
 template<class T>
 class PtrList : public std::list<T*> {
 	//typedef typename std::list<T*> type_t;
-	public:
+public:
 	typedef typename std::list<T*>::iterator iter_t;
 	// Like pop_front but return the value, or NULL if none.
 	T* pop_frontr() {
@@ -113,15 +113,15 @@ class ScopedIteratorTemplate : public BaseType::iterator {
 template <class T, class Fifo=PtrList<T> > class InterthreadQueue {
 	//protected:
 
-	Fifo mQ;	
+	Fifo mQ;
 	// (pat) DO NOT USE mLock and mWriteSignal; instead use mLockPointer and mWriteSignalPointer.
 	// That allows us to connect two InterthreadQueue together such that a single thread can wait on either.
 	mutable Mutex mLock, *mLockPointer;
 	mutable Signal mWriteSignal, *mWriteSignalPointer;
 
-	protected:
+protected:
 
-	public:
+public:
 	InterthreadQueue() : mLockPointer(&mLock), mWriteSignalPointer(&mWriteSignal) {}
 
 	// This connects the two InterthreadQueue permanently so they use the same lock and Signal.
@@ -201,7 +201,7 @@ template <class T, class Fifo=PtrList<T> > class InterthreadQueue {
 
 
 	~InterthreadQueue()
-		{ clear(); }
+	{ clear(); }
 
 
 	size_t size() const
@@ -305,7 +305,7 @@ template <class T, class Fifo=PtrList<T> > class InterthreadQueue {
 		// get a second pre-emptive activation over the writing thread,
 		// resulting in bursts of activity by the read thread. 
 		{ ScopedLock lock(*mLockPointer);
-		  mQ.put(val);
+			mQ.put(val);
 		}
 		mWriteSignalPointer->signal();
 	}
@@ -315,7 +315,7 @@ template <class T, class Fifo=PtrList<T> > class InterthreadQueue {
 	{
 		// (pat) See comments above.
 		{ ScopedLock lock(*mLockPointer);
-		  mQ.push_front(val);
+			mQ.push_front(val);
 		}
 		mWriteSignalPointer->signal();
 	}
@@ -327,16 +327,16 @@ template <class T, class Fifo=PtrList<T> > class InterthreadQueue {
 // Pat thinks this should be combined with InterthreadQueue by simply moving the wait method there.
 template <class T> class InterthreadQueueWithWait {
 
-	protected:
+protected:
 
-	PointerFIFO mQ;	
+	PointerFIFO mQ;
 	mutable Mutex mLock;
 	mutable Signal mWriteSignal;
 	mutable Signal mReadSignal;
 
 	virtual void freeElement(T* element) const { delete element; };
 
-	public:
+public:
 
 	/** Delete contents. */
 	void clear()
@@ -349,7 +349,7 @@ template <class T> class InterthreadQueueWithWait {
 
 
 	virtual ~InterthreadQueueWithWait()
-		{ clear(); }
+	{ clear(); }
 
 
 	size_t size() const
@@ -595,7 +595,7 @@ public:
 	}
 
 	// pat added.
-	unsigned size() const { ScopedLock(mLock); return mMap.size(); }
+	unsigned size() const { (ScopedLock(mLock)); return mMap.size(); }
 
 	// WARNING: These iterators are not intrinsically thread safe.
 	// Caller must use ScopedIterator or the modification lock or enclose the entire iteration in some higher level lock.
@@ -625,11 +625,11 @@ template <class K, class D > class InterthreadMap : public InterthreadMap1<K,D*>
 // The priority_queue sorts the largest element to the 'top' of the priority_queue, which is the back of the underlying vector.
 template <class T> class PointerCompare {
 
-	public:
+public:
 
 	/** Compare the objects pointed to, not the pointers themselves. */
 	bool operator()(const T *v1, const T *v2)
-		{ return (*v1)>(*v2); }
+	{ return (*v1)>(*v2); }
 
 };
 
@@ -642,7 +642,7 @@ template <class T> class PointerCompare {
 template <class T, class C = std::vector<T*>, class Cmp = PointerCompare<T> > class InterthreadPriorityQueue
 {
 
-	protected:
+protected:
 
 	std::priority_queue<T*,C,Cmp> mQ;
 	mutable Mutex mLock;
@@ -656,7 +656,7 @@ template <class T, class C = std::vector<T*>, class Cmp = PointerCompare<T> > cl
 		return result;
 	}
 
-	public:
+public:
 
 
 	/** Clear the FIFO. */
@@ -737,16 +737,16 @@ template <class T, class C = std::vector<T*>, class Cmp = PointerCompare<T> > cl
 
 class Semaphore {
 
-	private:
+private:
 
 	bool mFlag;
 	Signal mSignal;
 	mutable Mutex mLock;
 
-	public:
+public:
 
 	Semaphore()
-		:mFlag(false)
+			:mFlag(false)
 	{ }
 
 	void post()
