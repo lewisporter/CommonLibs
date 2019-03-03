@@ -23,27 +23,31 @@
 
 #include "Threads.h"
 
+#ifdef __APPLE__
+typedef void (*sighandler_t)(int sig);
+#endif
+
 /** A C++ wrapper for managing unix signals. */
 class UnixSignal
 {
 public:
-    static const int C_NSIG = 64;
+	static const int C_NSIG = 64;
 private:
-    std::list<sighandler_t>  mListHandlers[C_NSIG]; // list of signal handlers to call for all signals
-    Mutex mLock[C_NSIG];
-    bool mAddPid;				    // if true file is file.pid
-    std::string mCoreFile;			    // name of file to save to
-    bool mSaveFiles;				    // if true, save /proc related files in a compressed tarball
-    std::string mTarFile;			    // tarball for proc files
+	std::list<sighandler_t>  mListHandlers[C_NSIG]; // list of signal handlers to call for all signals
+	Mutex mLock[C_NSIG];
+	bool mAddPid;				    // if true file is file.pid
+	std::string mCoreFile;			    // name of file to save to
+	bool mSaveFiles;				    // if true, save /proc related files in a compressed tarball
+	std::string mTarFile;			    // tarball for proc files
 public:
-    UnixSignal(void);
-    ~UnixSignal(void);
+	UnixSignal(void);
+	~UnixSignal(void);
 
-    void Register(sighandler_t handler, int sig); // register a signal handler with the system
-    void Handler(int sig);    // main signal handler, iterates through mListHandlers
-    void Dump(void); // debug dump of list
-    inline void CoreName(const std::string &coreFile, bool addPid) { mCoreFile = coreFile; mAddPid = addPid; }
-    inline void TarName(const std::string &tarFile, bool saveFiles) { mTarFile = tarFile; mSaveFiles = saveFiles; }
+	void Register(sighandler_t handler, int sig); // register a signal handler with the system
+	void Handler(int sig);    // main signal handler, iterates through mListHandlers
+	void Dump(void); // debug dump of list
+	inline void CoreName(const std::string &coreFile, bool addPid) { mCoreFile = coreFile; mAddPid = addPid; }
+	inline void TarName(const std::string &tarFile, bool saveFiles) { mTarFile = tarFile; mSaveFiles = saveFiles; }
 };
 
 extern UnixSignal gSigVec;
